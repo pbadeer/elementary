@@ -61,11 +61,13 @@ jobs:
 
   notify_failures:
     name: Notify Slack
-    needs: test
+    secrets: inherit
+    needs: [test]
     if: |
       always() &&
-      ${{ needs.test.result == 'failure' }} &&
-      ! cancelled()
+      ! cancelled() &&
+      !contains(needs.test.result, 'success') &&
+      !contains(needs.test.result, 'cancelled')
     uses: ./.github/workflows/notify_slack.yml
     with:
       result: "failure"
